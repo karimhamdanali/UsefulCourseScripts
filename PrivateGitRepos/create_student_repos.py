@@ -6,29 +6,34 @@ from github3 import login
 import getpass
 import subprocess
 import csv
+import os
+import sys
 
 def get_name(repository):
 	return repository.name
 
 def run():
-	github = login('snadi', password = getpass.getpass())
-	memberships = github.organization_memberships()
-	seminar = None
+    base = os.path.abspath(os.path.dirname(sys.argv[0]))
+    username = 'karimhamdanali' # input('Enter your github username: ')
+    organization = 'staticanalysisseminar' # input('Enter your github organization: ')
+    github = login(username, password = getpass.getpass())
+    memberships = github.organization_memberships()
+    seminar = None
 
-	for membership in memberships:
-		if membership.organization.login == "spl-sem":
-			seminar = membership.organization
-			break
+    for membership in memberships:
+        if membership.organization.login == organization:
+            seminar = membership.organization
+            break
 
-	existing_repos = set(map(get_name,seminar.repositories()))	
+    existing_repos = set(map(get_name,seminar.iter_repos()))
 
-	with open("StudentList.csv") as studentFile:
-		reader = csv.DictReader(studentFile)
-		for student in reader:
-			repoName = "".join(student['Name'].split())
-			if not repoName in existing_repos and len(student['GitHubUsername']) > 0:
-				repository = seminar.create_repository(repoName, private=True)
-				repository.add_collaborator(student['GitHubUsername'])
-				subprocess.call("./CreateRepoStructure.sh " + repoName, shell=True)
+    with open(base + os.path.sep + "StudentList.csv") as studentFile:
+        reader = csv.DictReader(studentFile)
+        for student in reader:
+            repoName = "".join(student['Name'].split())
+            if not repoName in existing_repos and len(student['GitHubUsername']) > 0:
+                repository = seminar.create_repo(repoName, private=True)
+                repository.add_collaborator(student['GitHubUsername'])
+                subprocess.check_call([base + os.path.sep + "CreateRepoStructure.sh", organization, repoName])
 
 run()

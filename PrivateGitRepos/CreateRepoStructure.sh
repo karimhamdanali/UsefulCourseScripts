@@ -1,26 +1,31 @@
-repoName=$1
+#! /usr/bin/env bash
 
-git clone https://github.com/spl-sem/$repoName
+organization=$1
+repoName=$2
 
-cd $repoName
+# the path to this script (i.e., the repo named UsefulCourseScripts)
+pathtoscript=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+# the parent folder of the organization repo on disk (you can change this to wherever you want)
+base=$pathtoscript/../..
+
+# the path to the location where you want to create the repository (you can also change this if you like)
+repoLoc=$base/sastud/students/$repoName
+
+mkdir -p $repoLoc
+
+git clone git@github.com:$organization/$repoName.git $repoLoc
+
+echo "cloned repository to $repoLoc"
+
+cd $repoLoc
 
 while read line; do
   mkdir $line
-  echo "#Paper summary for $line">>$line/README.md
+
+  cat $pathtoscript/$line >> $line/README.md
   git add $line/README.md
   git commit $line/README.md -m "Creating folder for $line"
-done <../DirNames
-
-mkdir Project
-mkdir Project/Proposal
-mkdir Project/Paper
-mkdir Project/Presentation
-echo "#Project directory">>Project/README.md
-echo "#Paper directory">>Project/Paper/README.md
-echo "#Presentation directory">>Project/Presentation/README.md
-echo "#Proposal directory">>Project/Proposal/README.md
-
-git add Project/*
-git commit Project/ -m "project directory"
+done <$pathtoscript/DirNames
 
 git push
