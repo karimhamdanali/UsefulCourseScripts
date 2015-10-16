@@ -10,7 +10,7 @@ pathtoscript=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 base=$pathtoscript/../..
 
 # the path to the location where you want to create the repository (you can also change this if you like)
-repoLoc=$base/sastud/students/$repoName
+repoLoc=$base/students/$repoName
 
 mkdir -p $repoLoc
 
