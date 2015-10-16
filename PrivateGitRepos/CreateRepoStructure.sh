@@ -23,7 +23,7 @@ cd $repoLoc
 while read line; do
   mkdir $line
 
-  cat $pathtoscript/$line >> $line/README.md
+  cat $pathtoscript/$line > $line/README.md
   git add $line/README.md
   git commit $line/README.md -m "Creating folder for $line"
 done <$pathtoscript/DirNames
